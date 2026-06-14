@@ -37,6 +37,7 @@
       :loading="historyLoading"
       @prev-month="prevMonth"
       @next-month="nextMonth"
+      @jump-to-date="jumpToDate"
     />
 
     <div v-if="toast.show" class="toast" :class="{ error: toast.isError }">
@@ -146,6 +147,12 @@ function nextMonth() {
   } else {
     viewMonth.value++
   }
+  loadHistory()
+}
+
+function jumpToDate({ year, month }) {
+  viewYear.value = year
+  viewMonth.value = month
   loadHistory()
 }
 
