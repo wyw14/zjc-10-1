@@ -150,7 +150,7 @@ function nextMonth() {
   loadHistory()
 }
 
-function jumpToDate({ year, month }) {
+function jumpToDate({ year, month, date }) {
   viewYear.value = year
   viewMonth.value = month
   loadHistory()

@@ -137,6 +137,7 @@ const selectedDay = ref(null)
 const searchKeyword = ref('')
 const searchResults = ref([])
 const searching = ref(false)
+const pendingSelectedDate = ref(null)
 let searchTimer = null
 
 const fullCalendar = computed(() => {
@@ -244,22 +245,35 @@ function clearSearch() {
   if (searchTimer) clearTimeout(searchTimer)
 }
 
+function trySelectDay(dateStr) {
+  const day = props.history?.calendar?.find(d => d.date === dateStr)
+  if (day && day.hasQuestion) {
+    selectedDay.value = day
+    return true
+  }
+  return false
+}
+
 function jumpToDate(dateStr) {
   const d = new Date(dateStr)
+  pendingSelectedDate.value = dateStr
+  clearSearch()
   emit('jump-to-date', {
     year: d.getFullYear(),
     month: d.getMonth() + 1,
     date: dateStr
   })
-  clearSearch()
-  const day = props.history?.calendar?.find(d => d.date === dateStr)
-  if (day) {
-    selectedDay.value = day
-  }
+  trySelectDay(dateStr)
 }
 
-watch(() => props.history, () => {
-  if (searchResults.value.length === 0) {
+watch(() => props.history, (newHistory) => {
+  if (pendingSelectedDate.value) {
+    if (newHistory && newHistory.calendar) {
+      if (trySelectDay(pendingSelectedDate.value)) {
+        pendingSelectedDate.value = null
+      }
+    }
+  } else if (searchResults.value.length === 0) {
     selectedDay.value = null
   }
 })
